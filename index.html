@@ -3,102 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eficácia do Agente IA - CS Dashboard</title>
+    <title>Dashboard Eficácia IA - Customer Success</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* ESTILO GERAL */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f4f7f9; color: #333; }
+        /* MANTENDO SEU ESTILO ORIGINAL */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f0f2f5; color: #333; line-height: 1.6; }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header-info h1 { font-size: 1.8rem; margin-bottom: 5px; }
+        .btn-refresh { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; font-weight: 600; }
         
-        /* HEADER */
-        header { 
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
-            color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        /* SEÇÃO DE PIZZAS */
+        .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .chart-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-around; }
+        .chart-canvas-wrapper { width: 180px; height: 180px; }
+        .chart-info-side { text-align: left; }
+        .chart-info-side h4 { font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+        .chart-info-side .big-num { font-size: 2.5rem; font-weight: 800; color: #1e3c72; line-height: 1; }
 
-        /* CARDS PRINCIPAIS */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
-        .stat-card { 
-            background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            text-align: center; border-top: 5px solid #2a5298;
-        }
-        .stat-value { font-size: 2.5rem; font-weight: bold; margin: 10px 0; }
-        .stat-label { font-size: 0.85rem; color: #666; text-transform: uppercase; font-weight: 600; }
+        /* CARDS */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; align-items: center; border-bottom: 4px solid #1e3c72; text-align: center; }
+        .stat-card h3 { font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-value { font-size: 2.2rem; font-weight: 700; }
 
-        /* TABELA E ALERTAS */
-        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* TABELA */
+        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 0.8rem; color: #444; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-
-        /* LOGICA VISUAL (IF/ELSE) */
-        .status-green { color: #2e7d32; font-weight: bold; } /* Sucesso > 85% */
-        .status-red { color: #d32f2f; font-weight: bold; }   /* Alerta */
-        .flag-loop { background: #fff3e0; color: #e65100; padding: 4px 8px; border-radius: 4px; border: 1px solid #ffb74d; font-weight: bold; font-size: 0.75rem; }
+        th { padding: 15px 20px; text-align: left; font-size: 0.8rem; font-weight: 700; background: #f8f9fa; color: #495057; text-transform: uppercase; }
+        td { padding: 15px 20px; border-bottom: 1px solid #f1f3f5; font-size: 0.9rem; }
+        
+        .badge { padding: 5px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
+        .status-sucesso { background: #e8f5e9; color: #2e7d32; }
+        .status-alerta { background: #ffebee; color: #c62828; }
+        .flag-loop { color: #f57c00; font-weight: bold; font-size: 0.7rem; display: block; }
+        
+        /* MODAL E LOADING */
+        .loading-container { text-align: center; padding: 60px; display: none; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: white; width: 90%; max-width: 450px; border-radius: 12px; padding: 30px; text-align: center; }
+        .modal input { width: 100%; padding: 12px; margin: 20px 0; border: 1px solid #ddd; border-radius: 6px; }
+        .btn-primary { background: #2a5298; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; width: 100%; }
+        .btn-action { text-decoration: none; color: white; background-color: #2a5298; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <div>
-                <h1>Eficácia do Agente de IA</h1>
-                <p>Relatório de Performance para Customer Success</p>
-            </div>
-            <button class="btn-refresh" onclick="location.reload()" style="padding: 10px 20px; cursor:pointer;">Atualizar Dados</button>
-        </header>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">FCR (Resolução em 24h)</div>
-                <div class="stat-value status-green" id="fcr-val">92%</div>
-                <div class="stat-label" style="text-transform: none;">Meta: > 85%</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Taxa de Transbordo</div>
-                <div class="stat-value" id="handover-val">12%</div>
-                <div class="stat-label" style="text-transform: none;">Escalado para Humanos</div>
-            </div>
-            <div class="stat-card" style="border-top-color: #2e7d32;">
-                <div class="stat-label">Deflexão Efetiva</div>
-                <div class="stat-value" id="deflection-val">78%</div>
-                <div class="stat-label" style="text-transform: none;">Ganho Real de Produtividade</div>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID Sessão</th>
-                        <th>Status Eficácia</th>
-                        <th>Engajamento (Msgs)</th>
-                        <th>Sentimento</th>
-                        <th>Ação Tomada</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <tr>
-                        <td>#12345</td>
-                        <td><span class="status-green">Sucesso (Resolvido)</span></td>
-                        <td>8 mensagens</td>
-                        <td>Positivo</td>
-                        <td>Encerrado pela IA</td>
-                    </tr>
-                    <tr>
-                        <td>#12346</td>
-                        <td><span class="status-red">Alerta de Eficácia</span></td>
-                        <td>18 mensagens <span class="flag-loop">LOOP INFINITO?</span></td>
-                        <td>Negativo</td>
-                        <td>Transbordo Imediato</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="modal-overlay" id="tokenModal">
+        <div class="modal">
+            <i class="fas fa-shield-alt fa-3x" style="color: #2a5298; margin-bottom: 15px;"></i>
+            <h2>Acesso CS Dashboard</h2>
+            <input type="password" id="tokenInput" placeholder="Cole seu token aqui...">
+            <button class="btn-primary" onclick="saveTokenAndLoad()">Acessar Eficácia</button>
         </div>
     </div>
 
+    <div class="container">
+        <header>
+            <div class="header-info">
+                <h1><i class="fas fa-robot"></i> Performance do Agente IA</h1>
+                <p>Métricas de Eficácia e Resolução (FCR)</p>
+            </div>
+            <button class="btn-refresh" onclick="loadData()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+        </header>
+
+        <div id="loading" class="loading-container">
+            <i class="fas fa-circle-notch fa-spin fa-3x" style="color:#2a5298"></i>
+            <h3>Analisando conversas...</h3>
+        </div>
+
+        <div id="dashboard" style="display: none;">
+            
+            <div class="charts-row">
+                <div class="chart-box">
+                    <div class="chart-info-side">
+                        <h4>Taxa de Resolução</h4>
+                        <div class="big-num" id="fcr-perc">0%</div>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="chartFCR"></canvas>
+                    </div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-info-side">
+                        <h4>Eficiência (Deflexão)</h4>
+                        <div class="big-num" id="def-perc" style="color: #2e7d32;">0%</div>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="chartDef"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card" style="border-color: #1e3c72;">
+                    <h3>Total Atendimentos</h3>
+                    <div class="stat-value" id="count-total">0</div>
+                </div>
+                <div class="stat-card" style="border-color: #d32f2f;">
+                    <h3>Transbordos (Humanos)</h3>
+                    <div class="stat-value" id="count-handover" style="color: #d32f2f;">0</div>
+                </div>
+                <div class="stat-card" style="border-color: #2e7d32;">
+                    <h3>Resolvidos pela IA</h3>
+                    <div class="stat-value" id="count-resolved" style="color: #2e7d32;">0</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Contato</th>
+                            <th>Engajamento</th>
+                            <th>Sentimento</th>
+                            <th>Resultado</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WEBHOOK_URL = 'https://api.muvecom.com.br/v1/de8b08a0-e58e-4f02-b34c-218a682f9924';
+        const TERMOS_NEGATIVOS = ['PÉSSIMO', 'RUIM', 'NÃO GOSTEI', 'HUMANO', 'ATENDENTE', 'LENTO'];
+        
+        let currentToken = null;
+        let globalProcessedData = [];
+        let chartFCR, chartDef;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('token')) {
+                currentToken = urlParams.get('token');
+                loadData();
+            } else {
+                document.getElementById('tokenModal').classList.add('active');
+            }
+        });
+
+        function saveTokenAndLoad() {
+            currentToken = document.getElementById('tokenInput').value.trim();
+            if (currentToken) {
+                document.getElementById('tokenModal').classList.remove('active');
+                loadData();
+            }
+        }
+
+        async function loadData() {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: currentToken })
+                });
+                const rawData = await response.json();
+                const sessionsList = Array.isArray(rawData) ? rawData : (rawData.data || []);
+                processAndRender(sessionsList);
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('tokenModal').classList.add('active');
+            }
+        }
+
+        function processAndRender(sessions) {
+            let stats = { resolved: 0, handover: 0, total: sessions.length };
+            
+            globalProcessedData = sessions.map(session => {
+                const s = session.json ? session.json : session;
+                const msgs = (s.messages || []);
+                const userMsgs = msgs.filter(m => !m.fromBot).map(m => (m.text || "").toUpperCase()).join(" ");
+                const msgCount = msgs.length;
+                
+                // Lógica de Eficácia
+                let foiTransbordo = s.tags?.some(t => t.toLowerCase().includes('humano')) || userMsgs.includes('ATENDENTE');
+                let sentimento = TERMOS_NEGATIVOS.some(t => userMsgs.includes(t)) ? 'Negativo' : 'Positivo';
+                
+                let resultado = foiTransbordo ? "Transbordo" : "Resolvido IA";
+                if (foiTransbordo) stats.handover++; else stats.resolved++;
+
+                // Lógica de Alerta (Loop)
+                let temLoop = msgCount > 15 && !foiTransbordo;
+
+                return {
+                    id: s.id,
+                    data: new Date(s.createdAt || Date.now()).toLocaleString('pt-BR'),
+                    contato: s.contactName || s.name || "Desconhecido",
+                    engajamento: msgCount,
+                    sentimento: sentimento,
+                    resultado: resultado,
+                    temLoop: temLoop,
+                    classCSS: foiTransbordo ? "status-alerta" : "status-sucesso"
+                };
+            });
+
+            // Atualiza Interface
+            document.getElementById('count-total').innerText = stats.total;
+            document.getElementById('count-handover').innerText = stats.handover;
+            document.getElementById('count-resolved').innerText = stats.resolved;
+            
+            const fcrRate = stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(0) : 0;
+            document.getElementById('fcr-perc').innerText = fcrRate + "%";
+            document.getElementById('def-perc').innerText = fcrRate + "%";
+
+            initCharts(stats);
+            renderTable(globalProcessedData);
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+
+        function initCharts(stats) {
+            if (chartFCR) chartFCR.destroy();
+            if (chartDef) chartDef.destroy();
+
+            chartFCR = new Chart(document.getElementById('chartFCR'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Resolvido', 'Transbordo'],
+                    datasets: [{ data: [stats.resolved, stats.handover], backgroundColor: ['#1e3c72', '#e9ecef'] }]
+                },
+                options: { plugins: { legend: { display: false } }, cutout: '70%' }
+            });
+
+            chartDef = new Chart(document.getElementById('chartDef'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Deflexão', 'Manual'],
+                    datasets: [{ data: [stats.resolved, stats.handover], backgroundColor: ['#2e7d32', '#f1f3f5'] }]
+                },
+                options: { plugins: { legend: { display: false } }, cutout: '70%' }
+            });
+        }
+
+        function renderTable(data) {
+            const body = document.getElementById('table-body');
+            body.innerHTML = data.map(row => `
+                <tr>
+                    <td>${row.data}</td>
+                    <td><strong>${row.contato}</strong></td>
+                    <td>${row.engajamento} msgs ${row.temLoop ? '<span class="flag-loop">⚠️ Possível Loop</span>' : ''}</td>
+                    <td>${row.sentimento}</td>
+                    <td><span class="badge ${row.classCSS}">${row.resultado}</span></td>
+                    <td><a href="https://muvecom.wts.chat/chat2/sessions/${row.id}" target="_blank" class="btn-action">Auditar</a></td>
+                </tr>
+            `).join('');
+        }
+    </script>
 </body>
 </html>
