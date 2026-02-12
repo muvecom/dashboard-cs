@@ -139,6 +139,11 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('token')) {
                 currentToken = urlParams.get('token');
+                
+                // --- LIMPEZA DA URL ---
+                const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                window.history.replaceState({path: newUrl}, '', newUrl);
+                
                 loadData();
             } else {
                 document.getElementById('tokenModal').classList.add('active');
@@ -187,7 +192,7 @@
                 const userMsgs = msgs.filter(m => !m.fromBot).map(m => (m.text || "").toUpperCase()).join(" ");
                 let sentimento = TERMOS_NEGATIVOS.some(t => userMsgs.includes(t)) ? 'Negativo' : 'Positivo';
                 
-                // Classificação: Se terminou em pergunta, NÃO resolveu. Se terminou em afirmação, resolveu.
+                // Classificação: Se terminou em pergunta, NÃO resolveu.
                 let foiResolvido = !terminouEmPergunta;
                 
                 if (foiResolvido) stats.resolved++; else stats.nonResolved++;
