@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* MANTENDO SEU ESTILO ORIGINAL */
+        /* ESTILO ORIGINAL PRESERVADO */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f0f2f5; color: #333; line-height: 1.6; }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
@@ -15,7 +15,6 @@
         .header-info h1 { font-size: 1.8rem; margin-bottom: 5px; }
         .btn-refresh { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; font-weight: 600; }
         
-        /* SEÇÃO DE PIZZAS */
         .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
         .chart-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-around; }
         .chart-canvas-wrapper { width: 180px; height: 180px; }
@@ -23,13 +22,11 @@
         .chart-info-side h4 { font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
         .chart-info-side .big-num { font-size: 2.5rem; font-weight: 800; color: #1e3c72; line-height: 1; }
 
-        /* CARDS */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
         .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; align-items: center; border-bottom: 4px solid #1e3c72; text-align: center; }
         .stat-card h3 { font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 10px; }
         .stat-value { font-size: 2.2rem; font-weight: 700; }
 
-        /* TABELA */
         .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
         table { width: 100%; border-collapse: collapse; }
         th { padding: 15px 20px; text-align: left; font-size: 0.8rem; font-weight: 700; background: #f8f9fa; color: #495057; text-transform: uppercase; }
@@ -40,7 +37,6 @@
         .status-alerta { background: #ffebee; color: #c62828; }
         .flag-loop { color: #f57c00; font-weight: bold; font-size: 0.7rem; display: block; }
         
-        /* MODAL E LOADING */
         .loading-container { text-align: center; padding: 60px; display: none; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
@@ -65,7 +61,7 @@
         <header>
             <div class="header-info">
                 <h1><i class="fas fa-robot"></i> Performance do Agente IA</h1>
-                <p>Métricas de Eficácia e Resolução (FCR)</p>
+                <p>Métrica baseada em Resolução vs Pergunta Final</p>
             </div>
             <button class="btn-refresh" onclick="loadData()"><i class="fas fa-sync-alt"></i> Atualizar</button>
         </header>
@@ -89,7 +85,7 @@
                 </div>
                 <div class="chart-box">
                     <div class="chart-info-side">
-                        <h4>Eficiência (Deflexão)</h4>
+                        <h4>Índice de Deflexão</h4>
                         <div class="big-num" id="def-perc" style="color: #2e7d32;">0%</div>
                     </div>
                     <div class="chart-canvas-wrapper">
@@ -100,15 +96,15 @@
 
             <div class="stats-grid">
                 <div class="stat-card" style="border-color: #1e3c72;">
-                    <h3>Total Atendimentos</h3>
+                    <h3>Total Conversas</h3>
                     <div class="stat-value" id="count-total">0</div>
                 </div>
                 <div class="stat-card" style="border-color: #d32f2f;">
-                    <h3>Transbordos (Humanos)</h3>
+                    <h3>Não Resolvidos (Vácuo)</h3>
                     <div class="stat-value" id="count-handover" style="color: #d32f2f;">0</div>
                 </div>
                 <div class="stat-card" style="border-color: #2e7d32;">
-                    <h3>Resolvidos pela IA</h3>
+                    <h3>Resolvidos IA</h3>
                     <div class="stat-value" id="count-resolved" style="color: #2e7d32;">0</div>
                 </div>
             </div>
@@ -121,7 +117,7 @@
                             <th>Contato</th>
                             <th>Engajamento</th>
                             <th>Sentimento</th>
-                            <th>Resultado</th>
+                            <th>Status Final</th>
                             <th>Ação</th>
                         </tr>
                     </thead>
@@ -133,7 +129,7 @@
 
     <script>
         const WEBHOOK_URL = 'https://api.muvecom.com.br/v1/de8b08a0-e58e-4f02-b34c-218a682f9924';
-        const TERMOS_NEGATIVOS = ['PÉSSIMO', 'RUIM', 'NÃO GOSTEI', 'HUMANO', 'ATENDENTE', 'LENTO'];
+        const TERMOS_NEGATIVOS = ['RUIM', 'LENTO', 'PESSIMO', 'HUMANO', 'ATENDENTE'];
         
         let currentToken = null;
         let globalProcessedData = [];
@@ -176,44 +172,45 @@
         }
 
         function processAndRender(sessions) {
-            let stats = { resolved: 0, handover: 0, total: sessions.length };
+            let stats = { resolved: 0, nonResolved: 0, total: sessions.length };
             
             globalProcessedData = sessions.map(session => {
                 const s = session.json ? session.json : session;
                 const msgs = (s.messages || []);
-                const userMsgs = msgs.filter(m => !m.fromBot).map(m => (m.text || "").toUpperCase()).join(" ");
-                const msgCount = msgs.length;
                 
-                // Lógica de Eficácia
-                let foiTransbordo = s.tags?.some(t => t.toLowerCase().includes('humano')) || userMsgs.includes('ATENDENTE');
+                // Critério de Interrogação na última mensagem do robô
+                const lastBotMsg = [...msgs].reverse().find(m => m.fromBot);
+                const lastBotText = lastBotMsg ? (lastBotMsg.text || "") : "";
+                const terminouEmPergunta = lastBotText.trim().endsWith('?');
+
+                // Lógica de Sentimento
+                const userMsgs = msgs.filter(m => !m.fromBot).map(m => (m.text || "").toUpperCase()).join(" ");
                 let sentimento = TERMOS_NEGATIVOS.some(t => userMsgs.includes(t)) ? 'Negativo' : 'Positivo';
                 
-                let resultado = foiTransbordo ? "Transbordo" : "Resolvido IA";
-                if (foiTransbordo) stats.handover++; else stats.resolved++;
-
-                // Lógica de Alerta (Loop)
-                let temLoop = msgCount > 15 && !foiTransbordo;
+                // Classificação: Se terminou em pergunta, NÃO resolveu. Se terminou em afirmação, resolveu.
+                let foiResolvido = !terminouEmPergunta;
+                
+                if (foiResolvido) stats.resolved++; else stats.nonResolved++;
 
                 return {
                     id: s.id,
                     data: new Date(s.createdAt || Date.now()).toLocaleString('pt-BR'),
                     contato: s.contactName || s.name || "Desconhecido",
-                    engajamento: msgCount,
+                    engajamento: msgs.length,
                     sentimento: sentimento,
-                    resultado: resultado,
-                    temLoop: temLoop,
-                    classCSS: foiTransbordo ? "status-alerta" : "status-sucesso"
+                    resultado: foiResolvido ? "Resolvido IA" : "Vácuo / Pergunta",
+                    temLoop: msgs.length > 15,
+                    classCSS: foiResolvido ? "status-sucesso" : "status-alerta"
                 };
             });
 
-            // Atualiza Interface
             document.getElementById('count-total').innerText = stats.total;
-            document.getElementById('count-handover').innerText = stats.handover;
+            document.getElementById('count-handover').innerText = stats.nonResolved;
             document.getElementById('count-resolved').innerText = stats.resolved;
             
-            const fcrRate = stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(0) : 0;
-            document.getElementById('fcr-perc').innerText = fcrRate + "%";
-            document.getElementById('def-perc').innerText = fcrRate + "%";
+            const rate = stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(0) : 0;
+            document.getElementById('fcr-perc').innerText = rate + "%";
+            document.getElementById('def-perc').innerText = rate + "%";
 
             initCharts(stats);
             renderTable(globalProcessedData);
@@ -229,8 +226,8 @@
             chartFCR = new Chart(document.getElementById('chartFCR'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['Resolvido', 'Transbordo'],
-                    datasets: [{ data: [stats.resolved, stats.handover], backgroundColor: ['#1e3c72', '#e9ecef'] }]
+                    labels: ['Resolvido', 'Não Resolvido'],
+                    datasets: [{ data: [stats.resolved, stats.nonResolved], backgroundColor: ['#1e3c72', '#e9ecef'] }]
                 },
                 options: { plugins: { legend: { display: false } }, cutout: '70%' }
             });
@@ -239,7 +236,7 @@
                 type: 'doughnut',
                 data: {
                     labels: ['Deflexão', 'Manual'],
-                    datasets: [{ data: [stats.resolved, stats.handover], backgroundColor: ['#2e7d32', '#f1f3f5'] }]
+                    datasets: [{ data: [stats.resolved, stats.nonResolved], backgroundColor: ['#2e7d32', '#f1f3f5'] }]
                 },
                 options: { plugins: { legend: { display: false } }, cutout: '70%' }
             });
@@ -251,7 +248,7 @@
                 <tr>
                     <td>${row.data}</td>
                     <td><strong>${row.contato}</strong></td>
-                    <td>${row.engajamento} msgs ${row.temLoop ? '<span class="flag-loop">⚠️ Possível Loop</span>' : ''}</td>
+                    <td>${row.engajamento} msgs ${row.temLoop ? '<span class="flag-loop">⚠️ Fluxo Longo</span>' : ''}</td>
                     <td>${row.sentimento}</td>
                     <td><span class="badge ${row.classCSS}">${row.resultado}</span></td>
                     <td><a href="https://muvecom.wts.chat/chat2/sessions/${row.id}" target="_blank" class="btn-action">Auditar</a></td>
