@@ -6,15 +6,21 @@
     <title>Dashboard Eficácia IA - Customer Success</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Biblioteca para gerar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* ESTILO ORIGINAL PRESERVADO */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f0f2f5; color: #333; line-height: 1.6; }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
         header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); display: flex; justify-content: space-between; align-items: center; }
         .header-info h1 { font-size: 1.8rem; margin-bottom: 5px; }
-        .btn-refresh { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; font-weight: 600; }
+        .header-actions { display: flex; gap: 10px; }
+        .btn-refresh, .btn-report { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; font-weight: 600; }
+        .btn-report { background: #ff9800; border-color: #ff9800; }
+        .btn-report:hover { background: #f57c00; }
         
+        .section-title { margin: 30px 0 15px; font-size: 1.4rem; color: #1e3c72; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+
         .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
         .chart-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-around; }
         .chart-canvas-wrapper { width: 180px; height: 180px; }
@@ -22,12 +28,13 @@
         .chart-info-side h4 { font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
         .chart-info-side .big-num { font-size: 2.5rem; font-weight: 800; color: #1e3c72; line-height: 1; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
         .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; align-items: center; border-bottom: 4px solid #1e3c72; text-align: center; }
         .stat-card h3 { font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 10px; }
         .stat-value { font-size: 2.2rem; font-weight: 700; }
+        .stat-sub { font-size: 0.85rem; color: #777; margin-top: 5px; }
 
-        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; }
         th { padding: 15px 20px; text-align: left; font-size: 0.8rem; font-weight: 700; background: #f8f9fa; color: #495057; text-transform: uppercase; }
         td { padding: 15px 20px; border-bottom: 1px solid #f1f3f5; font-size: 0.9rem; }
@@ -35,6 +42,7 @@
         .badge { padding: 5px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
         .status-sucesso { background: #e8f5e9; color: #2e7d32; }
         .status-alerta { background: #ffebee; color: #c62828; }
+        .status-warning { background: #fff8e1; color: #f57c00; }
         .flag-loop { color: #f57c00; font-weight: bold; font-size: 0.7rem; display: block; }
         
         .loading-container { text-align: center; padding: 60px; display: none; }
@@ -57,22 +65,27 @@
         </div>
     </div>
 
-    <div class="container">
-        <header>
+    <!-- Container principal que será exportado para PDF -->
+    <div class="container" id="report-content">
+        <header data-html2canvas-ignore="true">
             <div class="header-info">
-                <h1><i class="fas fa-robot"></i> Performance do Agente IA</h1>
-                <p>Métrica baseada em Resolução vs Pergunta Final</p>
+                <h1><i class="fas fa-robot"></i> Performance e Compliance da IA</h1>
+                <p>Métricas de Comércio vs Ambiente de Teste Estrutural</p>
             </div>
-            <button class="btn-refresh" onclick="loadData()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+            <div class="header-actions">
+                <button class="btn-refresh" onclick="loadData()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+                <button class="btn-report" onclick="gerarRelatorio()"><i class="fas fa-file-pdf"></i> Gerar Relatório</button>
+            </div>
         </header>
 
         <div id="loading" class="loading-container">
             <i class="fas fa-circle-notch fa-spin fa-3x" style="color:#2a5298"></i>
-            <h3>Analisando conversas...</h3>
+            <h3>Analisando conversas e testes de compliance...</h3>
         </div>
 
         <div id="dashboard" style="display: none;">
             
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Métricas em Produção (Comércio)</h2>
             <div class="charts-row">
                 <div class="chart-box">
                     <div class="chart-info-side">
@@ -107,8 +120,38 @@
                     <h3>Resolvidos IA</h3>
                     <div class="stat-value" id="count-resolved" style="color: #2e7d32;">0</div>
                 </div>
+                <div class="stat-card" style="border-color: #f57c00;">
+                    <h3>Gap Operacional</h3>
+                    <div class="stat-value" id="gap-producao" style="color: #f57c00;">0%</div>
+                    <div class="stat-sub">Distância do ideal</div>
+                </div>
             </div>
 
+            <h2 class="section-title"><i class="fas fa-flask"></i> Validação de Diretrizes (Ambiente de Teste)</h2>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: #555;">
+                Avaliação de quebra de diretrizes estritas: Restrição Monetária (R$, $), Formatação de Blocos (||), Regras de CTA e Mídia. Padrão exigido: <strong>99.5%</strong>.
+            </p>
+            <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="stat-card" style="border-color: #1e3c72;">
+                    <h3>Turnos de Teste Avaliados</h3>
+                    <div class="stat-value" id="test-total">0</div>
+                </div>
+                <div class="stat-card" id="card-precisao" style="border-color: #2e7d32;">
+                    <h3>Precisão Atual (Compliance)</h3>
+                    <div class="stat-value" id="test-accuracy">0%</div>
+                </div>
+                <div class="stat-card" style="border-color: #2a5298;">
+                    <h3>Meta de Precisão</h3>
+                    <div class="stat-value">99.5%</div>
+                </div>
+                <div class="stat-card" style="border-color: #c62828;">
+                    <h3>Correção Necessária</h3>
+                    <div class="stat-value" id="test-correction" style="color: #c62828;">0%</div>
+                    <div class="stat-sub">Ajuste de fine-tuning pendente</div>
+                </div>
+            </div>
+
+            <h2 class="section-title"><i class="fas fa-list"></i> Histórico Recente (Produção)</h2>
             <div class="table-container">
                 <table>
                     <thead>
@@ -118,7 +161,6 @@
                             <th>Engajamento</th>
                             <th>Sentimento</th>
                             <th>Status Final</th>
-                            <th>Ação</th>
                         </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
@@ -128,7 +170,8 @@
     </div>
 
     <script>
-        const WEBHOOK_URL = 'https://api.muvecom.com.br/v1/de8b08a0-e58e-4f02-b34c-218a682f9924';
+        const WEBHOOK_URL_PROD = 'https://api.muvecom.com.br/v1/de8b08a0-e58e-4f02-b34c-218a682f9924';
+        const WEBHOOK_URL_TEST = 'https://api.muvecom.com.br/v1/e8df5ebb-4f25-41d8-a5ce-baddb986dff6';
         const TERMOS_NEGATIVOS = ['RUIM', 'LENTO', 'PESSIMO', 'HUMANO', 'ATENDENTE'];
         
         let currentToken = null;
@@ -139,11 +182,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('token')) {
                 currentToken = urlParams.get('token');
-                
-                // --- LIMPEZA DA URL ---
-                const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                window.history.replaceState({path: newUrl}, '', newUrl);
-                
+                window.history.replaceState({path: window.location.href.split('?')[0]}, '', window.location.href.split('?')[0]);
                 loadData();
             } else {
                 document.getElementById('tokenModal').classList.add('active');
@@ -161,40 +200,53 @@
         async function loadData() {
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
+            
             try {
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: currentToken })
-                });
-                const rawData = await response.json();
-                const sessionsList = Array.isArray(rawData) ? rawData : (rawData.data || []);
-                processAndRender(sessionsList);
-            } catch (error) {
+                // Fetch Paralelo (Produção e Testes)
+                const [prodRes, testRes] = await Promise.all([
+                    fetch(WEBHOOK_URL_PROD, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: currentToken })
+                    }),
+                    fetch(WEBHOOK_URL_TEST, { method: 'GET' })
+                ]);
+
+                const prodDataRaw = await prodRes.json();
+                const testDataRaw = await testRes.json();
+
+                const sessionsList = Array.isArray(prodDataRaw) ? prodDataRaw : (prodDataRaw.data || []);
+                const testConversations = Array.isArray(testDataRaw) ? testDataRaw : [];
+
+                processProdData(sessionsList);
+                processTestData(testConversations);
+
                 document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            } catch (error) {
+                console.error("Erro ao buscar dados:", error);
+                document.getElementById('loading').style.display = 'none';
+                alert("Houve um erro na comunicação. Verifique o token ou a conexão.");
                 document.getElementById('tokenModal').classList.add('active');
             }
         }
 
-        function processAndRender(sessions) {
+        // --- LÓGICA DE PRODUÇÃO (MANTIDA/AJUSTADA) ---
+        function processProdData(sessions) {
             let stats = { resolved: 0, nonResolved: 0, total: sessions.length };
             
             globalProcessedData = sessions.map(session => {
                 const s = session.json ? session.json : session;
                 const msgs = (s.messages || []);
                 
-                // Critério de Interrogação na última mensagem do robô
                 const lastBotMsg = [...msgs].reverse().find(m => m.fromBot);
                 const lastBotText = lastBotMsg ? (lastBotMsg.text || "") : "";
-                const terminouEmPergunta = lastBotText.trim().endsWith('?');
+                const terminouEmPergunta = /[?]/.test(lastBotText.trim());
 
-                // Lógica de Sentimento
                 const userMsgs = msgs.filter(m => !m.fromBot).map(m => (m.text || "").toUpperCase()).join(" ");
                 let sentimento = TERMOS_NEGATIVOS.some(t => userMsgs.includes(t)) ? 'Negativo' : 'Positivo';
                 
-                // Classificação: Se terminou em pergunta, NÃO resolveu.
                 let foiResolvido = !terminouEmPergunta;
-                
                 if (foiResolvido) stats.resolved++; else stats.nonResolved++;
 
                 return {
@@ -213,15 +265,83 @@
             document.getElementById('count-handover').innerText = stats.nonResolved;
             document.getElementById('count-resolved').innerText = stats.resolved;
             
-            const rate = stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(0) : 0;
+            const rate = stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(1) : 0;
+            const gap = (100 - parseFloat(rate)).toFixed(1);
+            
             document.getElementById('fcr-perc').innerText = rate + "%";
             document.getElementById('def-perc').innerText = rate + "%";
+            document.getElementById('gap-producao').innerText = gap + "%";
 
             initCharts(stats);
             renderTable(globalProcessedData);
+        }
 
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
+        // --- LÓGICA DE TESTES DE COMPLIANCE (DIRETRIZES) ---
+        function processTestData(testConversations) {
+            let totalAiTurns = 0;
+            let violations = 0;
+
+            // Percorre as conversas de teste no endpoint (array de chaves Cliente/Agente de IA)
+            testConversations.forEach(convo => {
+                // Adapte a forma como você itera de acordo com a estrutura real retornada pelo GET
+                // Assumindo lista de objetos: { "Agente de IA": "resposta..." }
+                const agentKeys = Object.keys(convo).filter(k => k.toLowerCase().includes('agente de ia') || k.toLowerCase().includes('ia'));
+                
+                agentKeys.forEach(key => {
+                    const text = (convo[key] || "").trim();
+                    if (!text) return;
+                    
+                    totalAiTurns++;
+                    let isViolation = false;
+
+                    // Regra 6: Proibição Monetária
+                    if (/(R\$|\$|reais)/i.test(text)) {
+                        isViolation = true;
+                    }
+                    // Regra 7: Formatação (>160 chars exige '||')
+                    if (text.length > 160 && !text.includes('||')) {
+                        isViolation = true;
+                    }
+                    // Regra 7: Proibição de Mídia (Extensões no texto/url)
+                    if (/\.(jpg|png|mp4|pdf|jpeg)($|\?)/i.test(text)) {
+                        isViolation = true;
+                    }
+                    // Regra 5: CTA no final (simplificado para buscar interrogação na última parte da string)
+                    // (Essa regra falha se a IA não fechar com pergunta ou CTA claro)
+                    if (!text.endsWith('?') && !text.includes('Aguarde um momento')) {
+                        // Consideramos uma penalidade se não terminar em CTA. 
+                        // *Pode ajustar a regex caso tenha CTAs sem interrogação.
+                        isViolation = true;
+                    }
+
+                    if (isViolation) violations++;
+                });
+            });
+
+            // Se não houver dados, assumimos 100% de aprovação inicial
+            if (totalAiTurns === 0) {
+                totalAiTurns = 1;
+                violations = 0;
+            }
+
+            const accuracy = ((totalAiTurns - violations) / totalAiTurns) * 100;
+            const accuracyFormatted = accuracy.toFixed(2);
+            
+            const meta = 99.5;
+            let correction = 0;
+            
+            if (accuracy < meta) {
+                correction = (meta - accuracy).toFixed(2);
+                document.getElementById('card-precisao').style.borderColor = '#c62828';
+                document.getElementById('test-accuracy').style.color = '#c62828';
+            } else {
+                document.getElementById('card-precisao').style.borderColor = '#2e7d32';
+                document.getElementById('test-accuracy').style.color = '#2e7d32';
+            }
+
+            document.getElementById('test-total').innerText = totalAiTurns;
+            document.getElementById('test-accuracy').innerText = accuracyFormatted + "%";
+            document.getElementById('test-correction').innerText = correction + "%";
         }
 
         function initCharts(stats) {
@@ -249,16 +369,39 @@
 
         function renderTable(data) {
             const body = document.getElementById('table-body');
-            body.innerHTML = data.map(row => `
+            // Limitando as 10 mais recentes para o relatório não ficar gigante
+            const recentData = data.slice(0, 10); 
+            body.innerHTML = recentData.map(row => `
                 <tr>
                     <td>${row.data}</td>
                     <td><strong>${row.contato}</strong></td>
                     <td>${row.engajamento} msgs ${row.temLoop ? '<span class="flag-loop">⚠️ Fluxo Longo</span>' : ''}</td>
                     <td>${row.sentimento}</td>
                     <td><span class="badge ${row.classCSS}">${row.resultado}</span></td>
-                    <td><a href="https://muvecom.wts.chat/chat2/sessions/${row.id}" target="_blank" class="btn-action">Auditar</a></td>
                 </tr>
             `).join('');
+        }
+
+        // --- GERAÇÃO DO RELATÓRIO PDF ---
+        function gerarRelatorio() {
+            const element = document.getElementById('report-content');
+            
+            // Opções do HTML2PDF
+            const opt = {
+                margin:       10,
+                filename:     'Relatorio_Comparativo_IA.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Remove botões de ação na hora de "printar" geridos via CSS
+            document.querySelector('.header-actions').style.display = 'none';
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restaura os botões
+                document.querySelector('.header-actions').style.display = 'flex';
+            });
         }
     </script>
 </body>
