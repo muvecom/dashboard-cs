@@ -209,7 +209,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ token: currentToken })
                     }),
-                    fetch(WEBHOOK_URL_TEST, { method: 'GET' })
+                    fetch(WEBHOOK_URL_TEST, { method: 'POST' })
                 ]);
 
                 const prodDataRaw = await prodRes.json();
