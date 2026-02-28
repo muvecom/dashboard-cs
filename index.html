@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,51 +10,276 @@
     <!-- Biblioteca para gerar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f0f2f5; color: #333; line-height: 1.6; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); display: flex; justify-content: space-between; align-items: center; }
-        .header-info h1 { font-size: 1.8rem; margin-bottom: 5px; }
-        .header-actions { display: flex; gap: 10px; }
-        .btn-refresh, .btn-report { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; font-weight: 600; }
-        .btn-report { background: #ff9800; border-color: #ff9800; }
-        .btn-report:hover { background: #f57c00; }
-        
-        .section-title { margin: 30px 0 15px; font-size: 1.4rem; color: #1e3c72; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-        .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
-        .chart-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-around; }
-        .chart-canvas-wrapper { width: 180px; height: 180px; }
-        .chart-info-side { text-align: left; }
-        .chart-info-side h4 { font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
-        .chart-info-side .big-num { font-size: 2.5rem; font-weight: 800; color: #1e3c72; line-height: 1; }
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; align-items: center; border-bottom: 4px solid #1e3c72; text-align: center; }
-        .stat-card h3 { font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 10px; }
-        .stat-value { font-size: 2.2rem; font-weight: 700; }
-        .stat-sub { font-size: 0.85rem; color: #777; margin-top: 5px; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { padding: 15px 20px; text-align: left; font-size: 0.8rem; font-weight: 700; background: #f8f9fa; color: #495057; text-transform: uppercase; }
-        td { padding: 15px 20px; border-bottom: 1px solid #f1f3f5; font-size: 0.9rem; }
-        
-        .badge { padding: 5px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
-        .status-sucesso { background: #e8f5e9; color: #2e7d32; }
-        .status-alerta { background: #ffebee; color: #c62828; }
-        .status-warning { background: #fff8e1; color: #f57c00; }
-        .flag-loop { color: #f57c00; font-weight: bold; font-size: 0.7rem; display: block; }
-        
-        .loading-container { text-align: center; padding: 60px; display: none; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s; }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal { background: white; width: 90%; max-width: 450px; border-radius: 12px; padding: 30px; text-align: center; }
-        .modal input { width: 100%; padding: 12px; margin: 20px 0; border: 1px solid #ddd; border-radius: 6px; }
-        .btn-primary { background: #2a5298; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; width: 100%; }
-        .btn-action { text-decoration: none; color: white; background-color: #2a5298; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; }
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-info h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-refresh,
+        .btn-report {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-report {
+            background: #ff9800;
+            border-color: #ff9800;
+        }
+
+        .btn-report:hover {
+            background: #f57c00;
+        }
+
+        .section-title {
+            margin: 30px 0 15px;
+            font-size: 1.4rem;
+            color: #1e3c72;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .chart-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .chart-canvas-wrapper {
+            width: 180px;
+            height: 180px;
+        }
+
+        .chart-info-side {
+            text-align: left;
+        }
+
+        .chart-info-side h4 {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .chart-info-side .big-num {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1e3c72;
+            line-height: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: 4px solid #1e3c72;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .stat-sub {
+            font-size: 0.85rem;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #f8f9fa;
+            color: #495057;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f3f5;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-sucesso {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-alerta {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-warning {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .flag-loop {
+            color: #f57c00;
+            font-weight: bold;
+            font-size: 0.7rem;
+            display: block;
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 60px;
+            display: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 12px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-action {
+            text-decoration: none;
+            color: white;
+            background-color: #2a5298;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="modal-overlay" id="tokenModal">
@@ -62,6 +288,9 @@
             <h2>Acesso Restrito</h2>
             <input type="password" id="tokenInput" placeholder="Cole seu token aqui...">
             <button class="btn-primary" onclick="saveTokenAndLoad()">Acessar Eficácia</button>
+            <a href="https://muvecom.wts.chat/integration/token" target="_blank"
+                style="display: block; margin-top: 15px; font-size: 0.9rem; color: #2a5298; text-decoration: none;">Esqueceu
+                o token?</a>
         </div>
     </div>
 
@@ -74,7 +303,8 @@
             </div>
             <div class="header-actions">
                 <button class="btn-refresh" onclick="loadData()"><i class="fas fa-sync-alt"></i> Atualizar</button>
-                <button class="btn-report" onclick="gerarRelatorio()"><i class="fas fa-file-pdf"></i> Gerar Relatório</button>
+                <button class="btn-report" onclick="gerarRelatorio()"><i class="fas fa-file-pdf"></i> Gerar
+                    Relatório</button>
             </div>
         </header>
 
@@ -84,7 +314,7 @@
         </div>
 
         <div id="dashboard" style="display: none;">
-            
+
             <h2 class="section-title"><i class="fas fa-chart-line"></i> Métricas em Produção (Comércio)</h2>
             <div class="charts-row">
                 <div class="chart-box">
@@ -129,7 +359,8 @@
 
             <h2 class="section-title"><i class="fas fa-flask"></i> Validação de Diretrizes (Ambiente de Teste)</h2>
             <p style="margin-bottom: 15px; font-size: 0.9rem; color: #555;">
-                Avaliação de quebra de diretrizes estritas: Restrição Monetária (R$, $), Formatação de Blocos (||), Regras de CTA e Mídia. Padrão exigido: <strong>99.5%</strong>.
+                Avaliação de quebra de diretrizes estritas: Restrição Monetária (R$, $), Formatação de Blocos (||),
+                Regras de CTA e Mídia. Padrão exigido: <strong>99.5%</strong>.
             </p>
             <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
                 <div class="stat-card" style="border-color: #1e3c72;">
@@ -173,7 +404,7 @@
         const WEBHOOK_URL_PROD = 'https://api.muvecom.com.br/v1/de8b08a0-e58e-4f02-b34c-218a682f9924';
         const WEBHOOK_URL_TEST = 'https://api.muvecom.com.br/v1/e8df5ebb-4f25-41d8-a5ce-baddb986dff6';
         const TERMOS_NEGATIVOS = ['RUIM', 'LENTO', 'PESSIMO', 'HUMANO', 'ATENDENTE'];
-        
+
         let currentToken = null;
         let globalProcessedData = [];
         let chartFCR, chartDef;
@@ -182,7 +413,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('token')) {
                 currentToken = urlParams.get('token');
-                window.history.replaceState({path: window.location.href.split('?')[0]}, '', window.location.href.split('?')[0]);
+                window.history.replaceState({ path: window.location.href.split('?')[0] }, '', window.location.href.split('?')[0]);
                 loadData();
             } else {
                 document.getElementById('tokenModal').classList.add('active');
@@ -200,7 +431,7 @@
         async function loadData() {
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
-            
+
             try {
                 // Fetch Paralelo (Produção e Testes)
                 const [prodRes, testRes] = await Promise.all([
@@ -215,7 +446,7 @@
                 const prodDataRaw = await prodRes.json();
                 const testDataRaw = await testRes.json();
 
-                const sessionsList = Array.isArray(prodDataRaw) ? prodDataRaw : (prodDataRaw.data || []);
+                const sessionsList = Array.isArray(prodDataRaw) ? prodDataRaw : (prodDataRaw.content || []);
                 const testConversations = Array.isArray(testDataRaw) ? testDataRaw : [];
 
                 processProdData(sessionsList);
@@ -234,25 +465,24 @@
         // --- LÓGICA DE PRODUÇÃO (MANTIDA/AJUSTADA) ---
         function processProdData(sessions) {
             let stats = { resolved: 0, nonResolved: 0, total: sessions.length };
-            
-            globalProcessedData = sessions.map(session => {
-                const s = session.json ? session.json : session;
-                const msgs = (s.messages || []);
-                
+
+            globalProcessedData = sessions.map(s => {
+                const msgs = (s.mensagens || []);
+
                 const lastBotMsg = [...msgs].reverse().find(m => m.fromBot);
-                const lastBotText = lastBotMsg ? (lastBotMsg.text || "") : "";
+                const lastBotText = lastBotMsg ? (lastBotMsg.texto || "") : "";
                 const terminouEmPergunta = /[?]/.test(lastBotText.trim());
 
-                const userMsgs = msgs.filter(m => !m.fromBot).map(m => (m.text || "").toUpperCase()).join(" ");
+                const userMsgs = msgs.filter(m => !m.fromBot).map(m => (m.texto || "").toUpperCase()).join(" ");
                 let sentimento = TERMOS_NEGATIVOS.some(t => userMsgs.includes(t)) ? 'Negativo' : 'Positivo';
-                
+
                 let foiResolvido = !terminouEmPergunta;
                 if (foiResolvido) stats.resolved++; else stats.nonResolved++;
 
                 return {
                     id: s.id,
-                    data: new Date(s.createdAt || Date.now()).toLocaleString('pt-BR'),
-                    contato: s.contactName || s.name || "Desconhecido",
+                    data: new Date(s.data || Date.now()).toLocaleString('pt-BR'),
+                    contato: s.contato || "Desconhecido",
                     engajamento: msgs.length,
                     sentimento: sentimento,
                     resultado: foiResolvido ? "Resolvido IA" : "Vácuo / Pergunta",
@@ -264,10 +494,10 @@
             document.getElementById('count-total').innerText = stats.total;
             document.getElementById('count-handover').innerText = stats.nonResolved;
             document.getElementById('count-resolved').innerText = stats.resolved;
-            
+
             const rate = stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(1) : 0;
             const gap = (100 - parseFloat(rate)).toFixed(1);
-            
+
             document.getElementById('fcr-perc').innerText = rate + "%";
             document.getElementById('def-perc').innerText = rate + "%";
             document.getElementById('gap-producao').innerText = gap + "%";
@@ -286,11 +516,11 @@
                 // Adapte a forma como você itera de acordo com a estrutura real retornada pelo GET
                 // Assumindo lista de objetos: { "Agente de IA": "resposta..." }
                 const agentKeys = Object.keys(convo).filter(k => k.toLowerCase().includes('agente de ia') || k.toLowerCase().includes('ia'));
-                
+
                 agentKeys.forEach(key => {
                     const text = (convo[key] || "").trim();
                     if (!text) return;
-                    
+
                     totalAiTurns++;
                     let isViolation = false;
 
@@ -326,10 +556,10 @@
 
             const accuracy = ((totalAiTurns - violations) / totalAiTurns) * 100;
             const accuracyFormatted = accuracy.toFixed(2);
-            
+
             const meta = 99.5;
             let correction = 0;
-            
+
             if (accuracy < meta) {
                 correction = (meta - accuracy).toFixed(2);
                 document.getElementById('card-precisao').style.borderColor = '#c62828';
@@ -370,7 +600,7 @@
         function renderTable(data) {
             const body = document.getElementById('table-body');
             // Limitando as 10 mais recentes para o relatório não ficar gigante
-            const recentData = data.slice(0, 10); 
+            const recentData = data.slice(0, 10);
             body.innerHTML = recentData.map(row => `
                 <tr>
                     <td>${row.data}</td>
@@ -385,14 +615,14 @@
         // --- GERAÇÃO DO RELATÓRIO PDF ---
         function gerarRelatorio() {
             const element = document.getElementById('report-content');
-            
+
             // Opções do HTML2PDF
             const opt = {
-                margin:       10,
-                filename:     'Relatorio_Comparativo_IA.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                margin: 10,
+                filename: 'Relatorio_Comparativo_IA.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             // Remove botões de ação na hora de "printar" geridos via CSS
@@ -405,4 +635,5 @@
         }
     </script>
 </body>
+
 </html>
