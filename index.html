@@ -298,100 +298,69 @@
     <div class="container" id="report-content">
         <header data-html2canvas-ignore="true">
             <div class="header-info">
-                <h1><i class="fas fa-robot"></i> Performance e Compliance da IA</h1>
-                <p>Métricas de Comércio vs Ambiente de Teste Estrutural</p>
+                <h1><i class="fas fa-vial"></i> QA & Eficácia de IA</h1>
+                <p>Análise de Qualidade, Lógica e Compliance em Testes Individuais</p>
             </div>
             <div class="header-actions">
                 <button class="btn-refresh" onclick="loadData()"><i class="fas fa-sync-alt"></i> Atualizar</button>
-                <button class="btn-report" onclick="gerarRelatorio()"><i class="fas fa-file-pdf"></i> Gerar
+                <button class="btn-report" onclick="gerarRelatorio()"><i class="fas fa-file-pdf"></i> Exportar
                     Relatório</button>
             </div>
         </header>
 
         <div id="loading" class="loading-container">
             <i class="fas fa-circle-notch fa-spin fa-3x" style="color:#2a5298"></i>
-            <h3>Analisando conversas e testes de compliance...</h3>
+            <h3>Analisando as diretrizes das conversas de teste...</h3>
         </div>
 
         <div id="dashboard" style="display: none;">
 
-            <h2 class="section-title"><i class="fas fa-chart-line"></i> Métricas em Produção (Comércio)</h2>
-            <div class="charts-row">
-                <div class="chart-box">
-                    <div class="chart-info-side">
-                        <h4>Taxa de Resolução</h4>
-                        <div class="big-num" id="fcr-perc">0%</div>
-                    </div>
-                    <div class="chart-canvas-wrapper">
-                        <canvas id="chartFCR"></canvas>
-                    </div>
-                </div>
-                <div class="chart-box">
-                    <div class="chart-info-side">
-                        <h4>Índice de Deflexão</h4>
-                        <div class="big-num" id="def-perc" style="color: #2e7d32;">0%</div>
-                    </div>
-                    <div class="chart-canvas-wrapper">
-                        <canvas id="chartDef"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card" style="border-color: #1e3c72;">
-                    <h3>Total Conversas</h3>
-                    <div class="stat-value" id="count-total">0</div>
-                </div>
-                <div class="stat-card" style="border-color: #d32f2f;">
-                    <h3>Não Resolvidos (Vácuo)</h3>
-                    <div class="stat-value" id="count-handover" style="color: #d32f2f;">0</div>
-                </div>
-                <div class="stat-card" style="border-color: #2e7d32;">
-                    <h3>Resolvidos IA</h3>
-                    <div class="stat-value" id="count-resolved" style="color: #2e7d32;">0</div>
-                </div>
-                <div class="stat-card" style="border-color: #f57c00;">
-                    <h3>Gap Operacional</h3>
-                    <div class="stat-value" id="gap-producao" style="color: #f57c00;">0%</div>
-                    <div class="stat-sub">Distância do ideal</div>
-                </div>
-            </div>
-
-            <h2 class="section-title"><i class="fas fa-flask"></i> Validação de Diretrizes (Ambiente de Teste)</h2>
-            <p style="margin-bottom: 15px; font-size: 0.9rem; color: #555;">
-                Avaliação de quebra de diretrizes estritas: Restrição Monetária (R$, $), Formatação de Blocos (||),
-                Regras de CTA e Mídia. Padrão exigido: <strong>99.5%</strong>.
-            </p>
             <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
                 <div class="stat-card" style="border-color: #1e3c72;">
-                    <h3>Turnos de Teste Avaliados</h3>
-                    <div class="stat-value" id="test-total">0</div>
+                    <h3>Último Teste (Score)</h3>
+                    <div class="stat-value" id="card-last-score">0%</div>
                 </div>
-                <div class="stat-card" id="card-precisao" style="border-color: #2e7d32;">
-                    <h3>Precisão Atual (Compliance)</h3>
-                    <div class="stat-value" id="test-accuracy">0%</div>
+                <div class="stat-card" style="border-color: #546e7a;">
+                    <h3>Teste Anterior</h3>
+                    <div class="stat-value" id="card-prev-score">0%</div>
                 </div>
-                <div class="stat-card" style="border-color: #2a5298;">
-                    <h3>Meta de Precisão</h3>
-                    <div class="stat-value">99.5%</div>
+                <div class="stat-card" id="card-variation-border" style="border-color: #000;">
+                    <h3>Variação de Melhora</h3>
+                    <div class="stat-value" id="card-variation">0%</div>
+                    <div class="stat-sub">Comparado ao penúltimo</div>
                 </div>
-                <div class="stat-card" style="border-color: #c62828;">
-                    <h3>Correção Necessária</h3>
-                    <div class="stat-value" id="test-correction" style="color: #c62828;">0%</div>
-                    <div class="stat-sub">Ajuste de fine-tuning pendente</div>
+                <div class="stat-card" style="border-color: #ff9800;">
+                    <h3>Média Global (Top 50)</h3>
+                    <div class="stat-value" id="card-avg-score">0%</div>
                 </div>
             </div>
 
-            <h2 class="section-title"><i class="fas fa-list"></i> Histórico Recente (Produção)</h2>
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Evolução de Desempenho (Linha do Tempo)</h2>
+            <div
+                style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;">
+                <div style="height: 300px; width: 100%;">
+                    <canvas id="chartEvolution"></canvas>
+                </div>
+            </div>
+
+            <h2 class="section-title"><i class="fas fa-bug"></i> Frequências de Falhas e Anomalias</h2>
+            <div
+                style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;">
+                <div style="height: 300px; width: 100%;">
+                    <canvas id="chartErrors"></canvas>
+                </div>
+            </div>
+
+            <h2 class="section-title"><i class="fas fa-list"></i> Histórico Detalhado dos Testes</h2>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>Data/Hora</th>
+                            <th>Data</th>
                             <th>Contato</th>
-                            <th>Engajamento</th>
-                            <th>Sentimento</th>
-                            <th>Status Final</th>
+                            <th>Última Resposta (Trecho)</th>
+                            <th>Status / Falhas</th>
+                            <th>Nota</th>
                         </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
@@ -401,13 +370,10 @@
     </div>
 
     <script>
-        const WEBHOOK_URL_PROD = 'https://evo.muvecom.com.br/webhook/de8b08a0-e58e-4f02-b34c-218a682f9924';
-        const WEBHOOK_URL_TEST = 'https://evo.muvecom.com.br/webhook/e8df5ebb-4f25-41d8-a5ce-baddb986dff6';
-        const TERMOS_NEGATIVOS = ['RUIM', 'LENTO', 'PESSIMO', 'HUMANO', 'ATENDENTE'];
+        const WEBHOOK_URL_TEST = 'https://api.muvecom.com.br/v1/e8df5ebb-4f25-41d8-a5ce-baddb986dff6';
 
         let currentToken = null;
-        let globalProcessedData = [];
-        let chartFCR, chartDef;
+        let chartEvolution, chartErrors;
 
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -433,193 +399,247 @@
             document.getElementById('loading').style.display = 'block';
 
             try {
-                // Fetch Paralelo (Produção e Testes)
-                const [prodRes, testRes] = await Promise.all([
-                    fetch(WEBHOOK_URL_PROD, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ token: currentToken })
-                    }),
-                    fetch(WEBHOOK_URL_TEST, { method: 'POST' })
-                ]);
+                // Busca de dados apenas para os Testes
+                const response = await fetch(WEBHOOK_URL_TEST, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: currentToken })
+                });
 
-                const prodDataRaw = await prodRes.json();
-                const testDataRaw = await testRes.json();
+                const rawData = await response.json();
+                const sessionsList = Array.isArray(rawData) ? rawData : (rawData.content || rawData.items || []);
 
-                const sessionsList = Array.isArray(prodDataRaw) ? prodDataRaw : (prodDataRaw.content || []);
-                const testConversations = Array.isArray(testDataRaw) ? testDataRaw : [];
+                processQA(sessionsList);
 
-                processProdData(sessionsList);
-                processTestData(testConversations);
-
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
             } catch (error) {
-                console.error("Erro ao buscar dados:", error);
+                console.error("Erro ao buscar dados de teste:", error);
                 document.getElementById('loading').style.display = 'none';
                 alert("Houve um erro na comunicação. Verifique o token ou a conexão.");
                 document.getElementById('tokenModal').classList.add('active');
             }
         }
 
-        // --- LÓGICA DE PRODUÇÃO (MANTIDA/AJUSTADA) ---
-        function processProdData(sessions) {
-            let stats = { resolved: 0, nonResolved: 0, total: sessions.length };
+        function processQA(conversations) {
+            const exceptions = ["obrigado", "obrigada", "transferindo", "protocolo", "disponha", "ajudar", "teste"];
+            const regexEmoji = /[\u1F300-\u1F9FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]/g;
+            const regexSintaxeSuja = /\?\s?[a-z]/g;
 
-            globalProcessedData = sessions.map(s => {
-                const msgs = (s.mensagens || []);
+            let tests = conversations.map(c => {
+                let date = new Date(c.createdAt || c.ultInteracao || c.data || Date.now());
+                let lastMsgText = c.lastMessageText || "";
 
-                const lastBotMsg = [...msgs].reverse().find(m => m.fromBot);
-                const lastBotText = lastBotMsg ? (lastBotMsg.texto || "") : "";
-                const terminouEmPergunta = /[?]/.test(lastBotText.trim());
+                // Fallback para caso tenha a array de mensagens
+                if (!lastMsgText && c.mensagens && c.mensagens.length) {
+                    const botMsgs = c.mensagens.filter(m => m.fromBot);
+                    if (botMsgs.length) lastMsgText = botMsgs[botMsgs.length - 1].texto || "";
+                }
 
-                const userMsgs = msgs.filter(m => !m.fromBot).map(m => (m.texto || "").toUpperCase()).join(" ");
-                let sentimento = TERMOS_NEGATIVOS.some(t => userMsgs.includes(t)) ? 'Negativo' : 'Positivo';
+                let isPending = c.unreadCount > 0;
+                let errors = [];
+                let categories = { extension: 0, logic: 0, consult: 0, syntax: 0, compliance: 0 };
 
-                let foiResolvido = !terminouEmPergunta;
-                if (foiResolvido) stats.resolved++; else stats.nonResolved++;
+                if (isPending) errors.push("Inatividade Crítica");
+
+                if (lastMsgText) {
+                    if (lastMsgText.length < 20 && !exceptions.some(e => lastMsgText.toLowerCase().includes(e))) {
+                        errors.push("Extensão Curta (Anomalia)"); categories.extension++;
+                    }
+                    if (lastMsgText.length > 560) {
+                        errors.push("Extensão Longa (Anomalia)"); categories.extension++;
+                    }
+                    if (/[\[\]{}_]/.test(lastMsgText)) {
+                        errors.push("Vazamento de Lógica"); categories.logic++;
+                    }
+
+                    const lowerText = lastMsgText.toLowerCase();
+                    const isExcecao = exceptions.some(e => lowerText.includes(e));
+                    if (!lastMsgText.includes('?') && lastMsgText.length >= 20 && !isExcecao) {
+                        errors.push("Baixa Consultividade"); categories.consult++;
+                    }
+
+                    if ((lastMsgText.match(regexSintaxeSuja) || []).length >= 2) {
+                        errors.push("Sintaxe Suja"); categories.syntax++;
+                    }
+                    if ((lastMsgText.match(regexEmoji) || []).length > 2) {
+                        errors.push("Excesso Emoji"); categories.syntax++;
+                    }
+
+                    if (/(R\$|\$|reais)/i.test(lastMsgText)) {
+                        errors.push("Restrição Monetária"); categories.compliance++;
+                    }
+                    if (lastMsgText.length > 200 && !lastMsgText.includes('||')) {
+                        errors.push("Sem formatação Blocos (||)"); categories.compliance++;
+                    }
+                    if (/\.(jpg|png|mp4|pdf|jpeg)($|\?)/i.test(lastMsgText)) {
+                        errors.push("Mídia Proibida"); categories.compliance++;
+                    }
+                }
+
+                if (!lastMsgText && !isPending) {
+                    lastMsgText = "Não houve resposta avaliável da IA.";
+                }
+
+                // Cálculo do Score individual (Desconto de nota por tipo de erro)
+                let score = 100 - (errors.length * 20); // Perde 20 pontos por anomalia
+                if (score < 0) score = 0;
+                if (!lastMsgText && !isPending && errors.length === 0) score = 0;
 
                 return {
-                    id: s.id,
-                    data: new Date(s.data || Date.now()).toLocaleString('pt-BR'),
-                    contato: s.contato || "Desconhecido",
-                    engajamento: msgs.length,
-                    sentimento: sentimento,
-                    resultado: foiResolvido ? "Resolvido IA" : "Vácuo / Pergunta",
-                    temLoop: msgs.length > 15,
-                    classCSS: foiResolvido ? "status-sucesso" : "status-alerta"
+                    id: c.id,
+                    contact: c.name || c.contato || c.contactName || "QA Tester",
+                    date: date,
+                    text: lastMsgText,
+                    errors: errors,
+                    score: score,
+                    categories: categories
                 };
             });
 
-            document.getElementById('count-total').innerText = stats.total;
-            document.getElementById('count-handover').innerText = stats.nonResolved;
-            document.getElementById('count-resolved').innerText = stats.resolved;
+            // Ordena crescente por data (Antigo -> Novo) para o gráfico de linha do tempo
+            tests.sort((a, b) => a.date - b.date);
 
-            const rate = stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(1) : 0;
-            const gap = (100 - parseFloat(rate)).toFixed(1);
+            // Popula os Cards principais pegando o topo da lista
+            let lastScore = 0;
+            let prevScore = 0;
+            if (tests.length > 0) lastScore = tests[tests.length - 1].score;
+            if (tests.length > 1) prevScore = tests[tests.length - 2].score;
 
-            document.getElementById('fcr-perc').innerText = rate + "%";
-            document.getElementById('def-perc').innerText = rate + "%";
-            document.getElementById('gap-producao').innerText = gap + "%";
+            let variation = lastScore - prevScore;
 
-            initCharts(stats);
-            renderTable(globalProcessedData);
-        }
+            document.getElementById('card-last-score').innerText = lastScore + "%";
+            document.getElementById('card-prev-score').innerText = prevScore + "%";
 
-        // --- LÓGICA DE TESTES DE COMPLIANCE (DIRETRIZES) ---
-        function processTestData(testConversations) {
-            let totalAiTurns = 0;
-            let violations = 0;
-
-            // Percorre as conversas de teste no endpoint (array de chaves Cliente/Agente de IA)
-            testConversations.forEach(convo => {
-                // Adapte a forma como você itera de acordo com a estrutura real retornada pelo GET
-                // Assumindo lista de objetos: { "Agente de IA": "resposta..." }
-                const agentKeys = Object.keys(convo).filter(k => k.toLowerCase().includes('agente de ia') || k.toLowerCase().includes('ia'));
-
-                agentKeys.forEach(key => {
-                    const text = (convo[key] || "").trim();
-                    if (!text) return;
-
-                    totalAiTurns++;
-                    let isViolation = false;
-
-                    // Regra 6: Proibição Monetária
-                    if (/(R\$|\$|reais)/i.test(text)) {
-                        isViolation = true;
-                    }
-                    // Regra 7: Formatação (>160 chars exige '||')
-                    if (text.length > 160 && !text.includes('||')) {
-                        isViolation = true;
-                    }
-                    // Regra 7: Proibição de Mídia (Extensões no texto/url)
-                    if (/\.(jpg|png|mp4|pdf|jpeg)($|\?)/i.test(text)) {
-                        isViolation = true;
-                    }
-                    // Regra 5: CTA no final (simplificado para buscar interrogação na última parte da string)
-                    // (Essa regra falha se a IA não fechar com pergunta ou CTA claro)
-                    if (!text.endsWith('?') && !text.includes('Aguarde um momento')) {
-                        // Consideramos uma penalidade se não terminar em CTA. 
-                        // *Pode ajustar a regex caso tenha CTAs sem interrogação.
-                        isViolation = true;
-                    }
-
-                    if (isViolation) violations++;
-                });
-            });
-
-            // Se não houver dados, assumimos 100% de aprovação inicial
-            if (totalAiTurns === 0) {
-                totalAiTurns = 1;
-                violations = 0;
-            }
-
-            const accuracy = ((totalAiTurns - violations) / totalAiTurns) * 100;
-            const accuracyFormatted = accuracy.toFixed(2);
-
-            const meta = 99.5;
-            let correction = 0;
-
-            if (accuracy < meta) {
-                correction = (meta - accuracy).toFixed(2);
-                document.getElementById('card-precisao').style.borderColor = '#c62828';
-                document.getElementById('test-accuracy').style.color = '#c62828';
+            const varEl = document.getElementById('card-variation');
+            const varBorder = document.getElementById('card-variation-border');
+            if (variation > 0) {
+                varEl.innerText = "+" + variation + "%";
+                varEl.style.color = "#2e7d32";
+                varBorder.style.borderColor = "#2e7d32";
+            } else if (variation < 0) {
+                varEl.innerText = variation + "%";
+                varEl.style.color = "#d32f2f";
+                varBorder.style.borderColor = "#d32f2f";
             } else {
-                document.getElementById('card-precisao').style.borderColor = '#2e7d32';
-                document.getElementById('test-accuracy').style.color = '#2e7d32';
+                varEl.innerText = "0%";
+                varEl.style.color = "#555";
+                varBorder.style.borderColor = "#555";
             }
 
-            document.getElementById('test-total').innerText = totalAiTurns;
-            document.getElementById('test-accuracy').innerText = accuracyFormatted + "%";
-            document.getElementById('test-correction').innerText = correction + "%";
+            // Exibir as 30 sessões mais recentes nos gráficos e cálculos
+            const recentTests = tests.slice(-30);
+            let avg = recentTests.length > 0 ? recentTests.reduce((acc, t) => acc + t.score, 0) / recentTests.length : 0;
+            document.getElementById('card-avg-score').innerText = avg.toFixed(1) + "%";
+
+            // Montar os Gráficos
+            renderCharts(recentTests);
+
+            // Montar Tabela ordenando do mais recente para o mais antigo
+            renderTable([...tests].reverse());
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
         }
 
-        function initCharts(stats) {
-            if (chartFCR) chartFCR.destroy();
-            if (chartDef) chartDef.destroy();
+        // Gera os gráficos de linha / velas
+        function renderCharts(tests) {
+            if (chartEvolution) chartEvolution.destroy();
+            if (chartErrors) chartErrors.destroy();
 
-            chartFCR = new Chart(document.getElementById('chartFCR'), {
-                type: 'doughnut',
+            // Rótulos do eixo X (Baseados no horário do teste)
+            const labels = tests.map(t => t.date.getDate().toString().padStart(2, '0') + '/' + (t.date.getMonth() + 1).toString().padStart(2, '0') + ' ' + t.date.getHours().toString().padStart(2, '0') + ':' + t.date.getMinutes().toString().padStart(2, '0'));
+
+            // Evolução das Notas
+            const dataScores = tests.map(t => t.score);
+
+            chartEvolution = new Chart(document.getElementById('chartEvolution'), {
+                type: 'line',
                 data: {
-                    labels: ['Resolvido', 'Não Resolvido'],
-                    datasets: [{ data: [stats.resolved, stats.nonResolved], backgroundColor: ['#1e3c72', '#e9ecef'] }]
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nota da IA (%) por Teste',
+                        data: dataScores,
+                        borderColor: '#2a5298',
+                        backgroundColor: 'rgba(42, 82, 152, 0.15)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#ff9800',
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.3
+                    }]
                 },
-                options: { plugins: { legend: { display: false } }, cutout: '70%' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { min: 0, max: 100 } },
+                    plugins: { legend: { position: 'top' } }
+                }
             });
 
-            chartDef = new Chart(document.getElementById('chartDef'), {
-                type: 'doughnut',
+            // Dados multifrequência de Erros e Anomalias
+            const extData = tests.map(t => t.categories.extension);
+            const logicData = tests.map(t => t.categories.logic);
+            const consultData = tests.map(t => t.categories.consult);
+            const syntaxData = tests.map(t => t.categories.syntax);
+            const compData = tests.map(t => t.categories.compliance);
+
+            chartErrors = new Chart(document.getElementById('chartErrors'), {
+                type: 'line',
                 data: {
-                    labels: ['Deflexão', 'Manual'],
-                    datasets: [{ data: [stats.resolved, stats.nonResolved], backgroundColor: ['#2e7d32', '#f1f3f5'] }]
+                    labels: labels,
+                    datasets: [
+                        { label: 'Extensão', data: extData, borderColor: '#f57c00', pointRadius: 3, tension: 0.2 },
+                        { label: 'Vazamento Lógica', data: logicData, borderColor: '#d32f2f', pointRadius: 3, tension: 0.2 },
+                        { label: 'Baixa Consultividade', data: consultData, borderColor: '#7b1fa2', pointRadius: 3, tension: 0.2 },
+                        { label: 'Sintaxe Suja', data: syntaxData, borderColor: '#388e3c', pointRadius: 3, tension: 0.2 },
+                        { label: 'Quebra Regra Monetária/Blocos', data: compData, borderColor: '#1976d2', pointRadius: 3, tension: 0.2 }
+                    ]
                 },
-                options: { plugins: { legend: { display: false } }, cutout: '70%' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { min: 0, ticks: { stepSize: 1, precision: 0 } } },
+                    plugins: { legend: { position: 'bottom' } }
+                }
             });
         }
 
-        function renderTable(data) {
+        // Tabela formatada e detalhada de testes
+        function renderTable(testsDecrescente) {
             const body = document.getElementById('table-body');
-            // Limitando as 10 mais recentes para o relatório não ficar gigante
-            const recentData = data.slice(0, 10);
-            body.innerHTML = recentData.map(row => `
+
+            // Limitamos a tabela aos 40 testes mais recentes
+            const display = testsDecrescente.slice(0, 40);
+
+            body.innerHTML = display.map(row => {
+                let badgeClass = "status-sucesso";
+                if (row.score < 100) badgeClass = "status-warning";
+                if (row.score <= 50) badgeClass = "status-alerta";
+
+                let errorsHtml = row.errors.length > 0
+                    ? row.errors.map(e => `<span style="display:inline-block; font-size:0.75rem; background:#ffebee; color:#c62828; padding:3px 6px; border-radius:4px; margin:2px; font-weight: 500;">${e}</span>`).join('')
+                    : '<span style="color:#2e7d32; font-weight:bold;"><i class="fas fa-check-circle"></i> Aprovado</span>';
+
+                let shortText = row.text.substring(0, 85);
+                if (row.text.length > 85) shortText += "...";
+
+                return `
                 <tr>
-                    <td>${row.data}</td>
-                    <td><strong>${row.contato}</strong></td>
-                    <td>${row.engajamento} msgs ${row.temLoop ? '<span class="flag-loop">⚠️ Fluxo Longo</span>' : ''}</td>
-                    <td>${row.sentimento}</td>
-                    <td><span class="badge ${row.classCSS}">${row.resultado}</span></td>
+                    <td style="font-size: 0.8rem; color: #666;">${row.date.toLocaleString('pt-BR')}</td>
+                    <td><strong>${row.contact}</strong></td>
+                    <td style="max-width:320px; font-style:italic; font-size:0.85rem; color:#444;" title="${row.text.replace(/"/g, '&quot;')}">"${shortText}"</td>
+                    <td>${errorsHtml}</td>
+                    <td><span class="badge ${badgeClass}">${row.score} / 100</span></td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         // --- GERAÇÃO DO RELATÓRIO PDF ---
         function gerarRelatorio() {
             const element = document.getElementById('report-content');
 
-            // Opções do HTML2PDF
             const opt = {
                 margin: 10,
-                filename: 'Relatorio_Comparativo_IA.pdf',
+                filename: 'Relatorio_Quality_Assurance_IA.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -629,7 +649,6 @@
             document.querySelector('.header-actions').style.display = 'none';
 
             html2pdf().set(opt).from(element).save().then(() => {
-                // Restaura os botões
                 document.querySelector('.header-actions').style.display = 'flex';
             });
         }
