@@ -370,7 +370,7 @@
     </div>
 
     <script>
-        const WEBHOOK_URL_TEST = 'https://api.muvecom.com.br/v1/e9c678f2-c3c2-4ecb-93f5-7edefe1b6203';
+        const WEBHOOK_URL_TEST = 'https://api.muvecom.com.br/v1/e8df5ebb-4f25-41d8-a5ce-baddb986dff6';
 
         let currentToken = null;
         let chartEvolution, chartErrors;
@@ -406,15 +406,29 @@
                     body: JSON.stringify({ token: currentToken })
                 });
 
+                if (!response.ok) {
+                    throw new Error('Token inválido ou erro de conexão com a API.');
+                }
+
                 const rawData = await response.json();
-                const sessionsList = Array.isArray(rawData) ? rawData : (rawData.content || rawData.items || []);
+
+                // Se o N8N retornar mensagem de erro forçada em JSON
+                if (rawData && rawData.message && !rawData.content && !rawData.items && !Array.isArray(rawData)) {
+                    throw new Error(rawData.message);
+                }
+
+                const sessionsList = Array.isArray(rawData) ? rawData : (rawData.content || rawData.items);
+
+                if (!sessionsList || !Array.isArray(sessionsList)) {
+                    throw new Error('Formato de dados desconhecido retornado da API.');
+                }
 
                 processQA(sessionsList);
 
             } catch (error) {
                 console.error("Erro ao buscar dados de teste:", error);
                 document.getElementById('loading').style.display = 'none';
-                alert("Houve um erro na comunicação. Verifique o token ou a conexão.");
+                alert("Erro ao carregar ou token inválido.");
                 document.getElementById('tokenModal').classList.add('active');
             }
         }
@@ -424,14 +438,30 @@
             const regexEmoji = /[\u1F300-\u1F9FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]/g;
             const regexSintaxeSuja = /\?\s?[a-z]/g;
 
-            let tests = conversations.map(c => {
-                let date = new Date(c.createdAt || c.ultInteracao || c.data || Date.now());
+            let validConversations = conversations.filter(c => c && (c.result || c.mensagens || c.lastMessageText));
+
+            let tests = validConversations.map(c => {
+                let date = new Date(c.createdAt || c.created_at || c.ultInteracao || c.data || Date.now());
                 let lastMsgText = c.lastMessageText || "";
 
                 // Fallback para caso tenha a array de mensagens
                 if (!lastMsgText && c.mensagens && c.mensagens.length) {
                     const botMsgs = c.mensagens.filter(m => m.fromBot);
                     if (botMsgs.length) lastMsgText = botMsgs[botMsgs.length - 1].texto || "";
+                }
+
+                // Fallback para a nova estrutura de teste (array `result`)
+                if (!lastMsgText && c.result && Array.isArray(c.result) && c.result.length > 0) {
+                    const lastTurn = c.result[c.result.length - 1];
+                    const aiText = lastTurn.ai || "";
+                    const humanText = lastTurn.human || "";
+
+                    // Lida com a transição da inversão (Se o human for maior ou tiver 'Lia', provável que seja o bot antes da inversão)
+                    if (humanText.length > aiText.length || humanText.includes('Lia') || humanText.includes('||')) {
+                        lastMsgText = humanText;
+                    } else {
+                        lastMsgText = aiText;
+                    }
                 }
 
                 let isPending = c.unreadCount > 0;
@@ -486,7 +516,7 @@
 
                 return {
                     id: c.id,
-                    contact: c.name || c.contato || c.contactName || "QA Tester",
+                    contact: c.company || c.name || c.contato || c.contactName || "QA Tester",
                     date: date,
                     text: lastMsgText,
                     errors: errors,
